@@ -21,6 +21,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link to="/expenses" className="text-muted-foreground hover:text-foreground transition-colors">Expenses</Link>
             <Link to="/loans" className="text-muted-foreground hover:text-foreground transition-colors">Loans</Link>
             <Link to="/analytics" className="text-muted-foreground hover:text-foreground transition-colors">Analytics</Link>
+            <Link to="/bank-accounts" className="text-muted-foreground hover:text-foreground transition-colors">Bank</Link>
+            <Link to="/transactions" className="text-muted-foreground hover:text-foreground transition-colors">Transactions</Link>
             <Link to="/settings" className="text-muted-foreground hover:text-foreground transition-colors">Settings</Link>
           </div>
         </div>

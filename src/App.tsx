@@ -9,6 +9,8 @@ import Settings from './pages/Settings';
 import Expenses from './pages/Expenses';
 import Loans from './pages/Loans';
 import Analytics from './pages/Analytics';
+import BankAccounts from './pages/BankAccounts';
+import Transactions from './pages/Transactions';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/loans" element={<Loans />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/bank-accounts" element={<BankAccounts />} />
+          <Route path="/transactions" element={<Transactions />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
