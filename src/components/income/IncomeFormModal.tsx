@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useEffect, useRef } from 'react';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
@@ -29,6 +29,7 @@ const schema = z.object({
   amount: z.number().positive('Amount must be greater than 0'),
   frequency: z.enum(['WEEKLY', 'BIWEEKLY', 'MONTHLY'], { message: 'Select a frequency' }),
   nextPayDate: z.string().min(1, 'Next pay date is required'),
+  secondPayDay: z.number().min(1).max(31).nullable().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -48,6 +49,7 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
     handleSubmit,
     reset,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -57,8 +59,26 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
       amount: undefined,
       frequency: 'MONTHLY',
       nextPayDate: '',
+      secondPayDay: null,
     },
   });
+
+  const frequency = useWatch({ control, name: 'frequency' });
+  const nextPayDate = useWatch({ control, name: 'nextPayDate' });
+  const didAutoSet = useRef(false);
+
+  // Auto-default second pay day when biweekly is selected
+  useEffect(() => {
+    if (frequency === 'BIWEEKLY' && nextPayDate && !didAutoSet.current) {
+      const day = new Date(nextPayDate).getUTCDate();
+      const defaultSecond = day <= 15 ? day + 15 : day - 15;
+      setValue('secondPayDay', Math.min(Math.max(defaultSecond, 1), 28));
+      didAutoSet.current = true;
+    }
+    if (frequency !== 'BIWEEKLY') {
+      didAutoSet.current = false;
+    }
+  }, [frequency, nextPayDate, setValue]);
 
   useEffect(() => {
     if (open) {
@@ -68,14 +88,18 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
           amount: source.amount,
           frequency: source.frequency as FormData['frequency'],
           nextPayDate: source.nextPayDate,
+          secondPayDay: source.secondPayDay ?? null,
         });
       } else {
-        reset({ name: '', amount: undefined, frequency: 'MONTHLY', nextPayDate: '' });
+        reset({ name: '', amount: undefined, frequency: 'MONTHLY', nextPayDate: '', secondPayDay: null });
       }
     }
   }, [open, source, reset]);
 
   const handleFormSubmit = async (data: FormData) => {
+    if (data.frequency !== 'BIWEEKLY') {
+      data.secondPayDay = null;
+    }
     await onSubmit(data);
     onOpenChange(false);
   };
@@ -98,7 +122,7 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount ($)</Label>
+            <Label htmlFor="amount">Amount per paycheck ($)</Label>
             <Input id="amount" type="number" step="0.01" min="0.01" placeholder="0.00" {...register('amount', { valueAsNumber: true })} />
             {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
           </div>
@@ -115,7 +139,7 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="WEEKLY">Weekly</SelectItem>
-                    <SelectItem value="BIWEEKLY">Biweekly</SelectItem>
+                    <SelectItem value="BIWEEKLY">Biweekly (twice a month)</SelectItem>
                     <SelectItem value="MONTHLY">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
@@ -125,10 +149,28 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="nextPayDate">Next Pay Date</Label>
+            <Label htmlFor="nextPayDate">{frequency === 'BIWEEKLY' ? 'First Pay Date' : 'Next Pay Date'}</Label>
             <Input id="nextPayDate" type="date" {...register('nextPayDate')} />
             {errors.nextPayDate && <p className="text-sm text-destructive">{errors.nextPayDate.message}</p>}
           </div>
+
+          {frequency === 'BIWEEKLY' && (
+            <div className="space-y-2">
+              <Label htmlFor="secondPayDay">Second Pay Day of Month</Label>
+              <Input
+                id="secondPayDay"
+                type="number"
+                min="1"
+                max="31"
+                placeholder="e.g. 20"
+                {...register('secondPayDay', { valueAsNumber: true, setValueAs: (v) => (v === '' || v === undefined ? null : Number(v)) })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the day of the month for your second paycheck (e.g. if you get paid on the 5th and 20th, enter 20)
+              </p>
+              {errors.secondPayDay && <p className="text-sm text-destructive">{errors.secondPayDay.message}</p>}
+            </div>
+          )}
 
           <DialogFooter>
             <DialogClose render={<Button variant="outline" type="button" />}>Cancel</DialogClose>

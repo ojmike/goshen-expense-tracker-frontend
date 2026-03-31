@@ -7,3 +7,10 @@ export function useDashboard(year: number, month: number) {
     queryFn: () => dashboardService.getOverview(year, month),
   });
 }
+
+export function useCashFlow(year: number, month: number) {
+  return useQuery({
+    queryKey: ['cashflow', year, month],
+    queryFn: () => dashboardService.getCashFlow(year, month),
+  });
+}

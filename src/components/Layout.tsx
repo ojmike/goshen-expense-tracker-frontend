@@ -1,10 +1,29 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../hooks/useAuth';
+
+function useTheme() {
+  const [dark, setDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }, [dark]);
+
+  return { dark, toggle: () => setDark((d) => !d) };
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { dark, toggle } = useTheme();
 
   const handleLogout = async () => {
     await logout();
@@ -26,7 +45,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link to="/settings" className="text-muted-foreground hover:text-foreground transition-colors">Settings</Link>
           </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleLogout}>Sign out</Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon-sm" onClick={toggle} aria-label="Toggle theme">
+            {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleLogout}>Sign out</Button>
+        </div>
       </nav>
       <main className="p-4 sm:p-6">{children}</main>
     </div>

@@ -46,7 +46,9 @@ export default function IncomeCard({ source, onEdit, onDelete }: IncomeCardProps
           </p>
         )}
         <p className="text-sm text-muted-foreground">
-          Next pay: {format(parseISO(source.nextPayDate), 'MMM d, yyyy')}
+          {source.frequency === 'BIWEEKLY' && source.secondPayDay
+            ? `Pay days: ${new Date(source.nextPayDate).getUTCDate()} & ${source.secondPayDay} of each month`
+            : `Next pay: ${format(parseISO(source.nextPayDate), 'MMM d, yyyy')}`}
         </p>
       </CardContent>
     </Card>

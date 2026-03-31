@@ -41,3 +41,14 @@ export function useDeleteExpense(year: number, month: number) {
     },
   });
 }
+
+export function useCopyExpensesFromPreviousMonth(year: number, month: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => expenseService.copyFromPreviousMonth(year, month),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses', year, month] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}

@@ -50,4 +50,7 @@ export const loanService = {
 
   deletePayment: (loanId: number, paymentId: number) =>
     api.delete(`/loans/${loanId}/payments/${paymentId}`),
+
+  copyPaymentsFromPreviousMonth: (year: number, month: number) =>
+    api.post<LoanPayment[]>('/loans/copy-payments', null, { params: { year, month } }).then((res) => res.data),
 };

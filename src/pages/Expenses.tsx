@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
-import { Loader2, Pencil, Trash2, Plus, Receipt } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Plus, Receipt, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
 import MonthSelector from '@/components/expenses/MonthSelector';
 import ExpenseFormModal from '@/components/expenses/ExpenseFormModal';
 import DeleteExpenseDialog from '@/components/expenses/DeleteExpenseDialog';
-import { useMonthlyExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense } from '@/hooks/useExpenses';
+import { useMonthlyExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense, useCopyExpensesFromPreviousMonth } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
+import { useDashboard } from '@/hooks/useDashboard';
 import type { Expense } from '@/services/expenseService';
 
 const currencyFormat = new Intl.NumberFormat('en-US', {
@@ -28,9 +29,12 @@ export default function Expenses() {
 
   const { data: overview, isLoading } = useMonthlyExpenses(year, month);
   const { data: categories = [] } = useCategories();
+  const { data: dashboard } = useDashboard(year, month);
+  const leftover = dashboard?.leftover ?? 0;
   const createExpense = useCreateExpense(year, month);
   const updateExpense = useUpdateExpense(year, month);
   const deleteExpense = useDeleteExpense(year, month);
+  const copyExpenses = useCopyExpensesFromPreviousMonth(year, month);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -68,20 +72,36 @@ export default function Expenses() {
       <div className="mx-auto max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Expenses</h1>
-          <Button onClick={handleAdd}>
-            <Plus className="size-4" />
-            Add Expense
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => copyExpenses.mutate()} disabled={copyExpenses.isPending}>
+              {copyExpenses.isPending ? <Loader2 className="size-4 animate-spin" /> : <Copy className="size-4" />}
+              Copy Previous Month
+            </Button>
+            <Button onClick={handleAdd}>
+              <Plus className="size-4" />
+              Add Expense
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center justify-between">
           <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); }} />
-          {hasExpenses && (
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Total this month</p>
-              <p className="text-xl font-semibold">{currencyFormat.format(overview.totalAmount)}</p>
-            </div>
-          )}
+          <div className="flex gap-6">
+            {hasExpenses && (
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Total this month</p>
+                <p className="text-xl font-semibold">{currencyFormat.format(overview.totalAmount)}</p>
+              </div>
+            )}
+            {dashboard && (
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Leftover</p>
+                <p className={`text-xl font-semibold ${leftover >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {currencyFormat.format(leftover)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {isLoading ? (

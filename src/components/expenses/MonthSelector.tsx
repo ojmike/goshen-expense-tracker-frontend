@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MonthSelectorProps {
   year: number;
@@ -9,9 +10,15 @@ interface MonthSelectorProps {
 }
 
 export default function MonthSelector({ year, month, onChange }: MonthSelectorProps) {
+  const { user } = useAuth();
   const date = new Date(year, month - 1);
 
+  const minYear = user?.trackingStartYear;
+  const minMonth = user?.trackingStartMonth;
+  const isAtMin = minYear != null && minMonth != null && year === minYear && month === minMonth;
+
   const handlePrev = () => {
+    if (isAtMin) return;
     if (month === 1) {
       onChange(year - 1, 12);
     } else {
@@ -29,7 +36,7 @@ export default function MonthSelector({ year, month, onChange }: MonthSelectorPr
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="outline" size="icon-sm" onClick={handlePrev} aria-label="Previous month">
+      <Button variant="outline" size="icon-sm" onClick={handlePrev} disabled={isAtMin} aria-label="Previous month">
         <ChevronLeft />
       </Button>
       <span className="min-w-[140px] text-center text-sm font-medium">

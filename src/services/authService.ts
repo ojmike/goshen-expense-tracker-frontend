@@ -10,6 +10,8 @@ interface UserResponse {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  trackingStartYear: number | null;
+  trackingStartMonth: number | null;
 }
 
 interface RegisterData {
@@ -56,6 +58,13 @@ const authService = {
 
   async getMe(): Promise<UserResponse> {
     const response = await api.get<UserResponse>('/auth/me');
+    return response.data;
+  },
+
+  async setTrackingStart(year: number, month: number): Promise<UserResponse> {
+    const response = await api.put<UserResponse>('/auth/me/tracking-start', null, {
+      params: { year, month },
+    });
     return response.data;
   },
 };

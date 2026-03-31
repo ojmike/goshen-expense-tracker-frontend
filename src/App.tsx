@@ -5,6 +5,10 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import IncomeBreakdown from './pages/IncomeBreakdown';
+import ExpenseBreakdown from './pages/ExpenseBreakdown';
+import BudgetBreakdown from './pages/BudgetBreakdown';
+import DebtBreakdown from './pages/DebtBreakdown';
 import Settings from './pages/Settings';
 import Expenses from './pages/Expenses';
 import Loans from './pages/Loans';
@@ -22,6 +26,10 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/income" element={<IncomeBreakdown />} />
+          <Route path="/dashboard/expenses" element={<ExpenseBreakdown />} />
+          <Route path="/dashboard/budget" element={<BudgetBreakdown />} />
+          <Route path="/dashboard/debt" element={<DebtBreakdown />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/loans" element={<Loans />} />
           <Route path="/analytics" element={<Analytics />} />

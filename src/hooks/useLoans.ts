@@ -63,3 +63,15 @@ export function useDeletePayment(loanId: number | null) {
     },
   });
 }
+
+export function useCopyLoanPaymentsFromPreviousMonth() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ year, month }: { year: number; month: number }) =>
+      loanService.copyPaymentsFromPreviousMonth(year, month),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LOANS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}

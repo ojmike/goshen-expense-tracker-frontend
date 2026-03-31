@@ -6,6 +6,7 @@ export interface IncomeSource {
   amount: number;
   frequency: string;
   nextPayDate: string;
+  secondPayDay: number | null;
   monthlyEquivalent: number;
   createdAt: string;
 }
@@ -15,6 +16,7 @@ export interface IncomeSourceRequest {
   amount: number;
   frequency: string;
   nextPayDate: string;
+  secondPayDay?: number | null;
 }
 
 export interface IncomeOverview {

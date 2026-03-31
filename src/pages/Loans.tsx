@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { isAxiosError } from 'axios';
-import { Loader2, Plus, ArrowLeft } from 'lucide-react';
+import { Loader2, Plus, ArrowLeft, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import LoanCard from '@/components/loans/LoanCard';
@@ -10,7 +10,7 @@ import PaymentFormModal from '@/components/loans/PaymentFormModal';
 import PaymentHistory from '@/components/loans/PaymentHistory';
 import DeletePaymentDialog from '@/components/loans/DeletePaymentDialog';
 import LoanEmptyState from '@/components/loans/LoanEmptyState';
-import { useLoans, useLoanDetail, useCreateLoan, useDeleteLoan, useRecordPayment, useDeletePayment } from '@/hooks/useLoans';
+import { useLoans, useLoanDetail, useCreateLoan, useDeleteLoan, useRecordPayment, useDeletePayment, useCopyLoanPaymentsFromPreviousMonth } from '@/hooks/useLoans';
 import type { Loan, LoanPayment } from '@/services/loanService';
 
 const currencyFormat = new Intl.NumberFormat('en-US', {
@@ -28,6 +28,7 @@ export default function Loans() {
 
   const recordPayment = useRecordPayment(selectedLoanId);
   const deletePayment = useDeletePayment(selectedLoanId);
+  const copyPayments = useCopyLoanPaymentsFromPreviousMonth();
 
   const [loanFormOpen, setLoanFormOpen] = useState(false);
   const [deletingLoan, setDeletingLoan] = useState<Loan | null>(null);
@@ -147,10 +148,23 @@ export default function Loans() {
       <div className="mx-auto max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Loans</h1>
-          <Button onClick={() => setLoanFormOpen(true)}>
-            <Plus className="size-4" />
-            Add Loan
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const now = new Date();
+                copyPayments.mutate({ year: now.getFullYear(), month: now.getMonth() + 1 });
+              }}
+              disabled={copyPayments.isPending}
+            >
+              {copyPayments.isPending ? <Loader2 className="size-4 animate-spin" /> : <Copy className="size-4" />}
+              Copy Previous Payments
+            </Button>
+            <Button onClick={() => setLoanFormOpen(true)}>
+              <Plus className="size-4" />
+              Add Loan
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (
