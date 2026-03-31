@@ -18,10 +18,8 @@ const frequencyLabels: Record<string, string> = {
   MONTHLY: 'Monthly',
 };
 
-const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const renderCustomLabel = ({ name, percent }: { name: string; percent: number }) =>
-  percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : '';
+const renderCustomLabel = ({ name, percent }: { name?: string; percent?: number }) =>
+  percent != null && percent > 0.05 ? `${name ?? ''} ${(percent * 100).toFixed(0)}%` : '';
 
 export default function IncomeBreakdown() {
   const navigate = useNavigate();

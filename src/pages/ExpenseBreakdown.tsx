@@ -12,10 +12,8 @@ const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#d946ef', '#0891b2'
 
 const currencyFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const renderCustomLabel = ({ name, percent }: { name: string; percent: number }) =>
-  percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : '';
+const renderCustomLabel = ({ name, percent }: { name?: string; percent?: number }) =>
+  percent != null && percent > 0.05 ? `${name ?? ''} ${(percent * 100).toFixed(0)}%` : '';
 
 export default function ExpenseBreakdown() {
   const navigate = useNavigate();

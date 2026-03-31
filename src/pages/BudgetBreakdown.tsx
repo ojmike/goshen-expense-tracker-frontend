@@ -13,8 +13,6 @@ import { useDashboard, useCashFlow } from '@/hooks/useDashboard';
 
 const currencyFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 export default function BudgetBreakdown() {
   const navigate = useNavigate();
   const [params] = useSearchParams();

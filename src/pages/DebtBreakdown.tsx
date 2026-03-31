@@ -12,10 +12,8 @@ const COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#d946ef', '#ea580c'
 
 const currencyFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const renderCustomLabel = ({ name, percent }: { name: string; percent: number }) =>
-  percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : '';
+const renderCustomLabel = ({ name, percent }: { name?: string; percent?: number }) =>
+  percent != null && percent > 0.05 ? `${name ?? ''} ${(percent * 100).toFixed(0)}%` : '';
 
 export default function DebtBreakdown() {
   const navigate = useNavigate();
@@ -96,7 +94,7 @@ export default function DebtBreakdown() {
                         innerRadius={65}
                         paddingAngle={3}
                         dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }: { name?: string; percent?: number }) => `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`}
                         labelLine={false}
                       >
                         <Cell fill="#10b981" />
