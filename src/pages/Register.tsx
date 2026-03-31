@@ -64,7 +64,7 @@ export default function Register() {
       } else if (isAxiosError(err) && !err.response) {
         setServerError('Unable to connect. Check your internet connection and try again.');
       } else {
-        setServerError('An account with this email already exists. Try signing in instead.');
+        setServerError('Something went wrong. Please try again.');
       }
     }
   };

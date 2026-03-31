@@ -20,5 +20,5 @@ export const categoryService = {
   update: (id: number, data: CategoryRequest) =>
     api.put<Category>(`/categories/${id}`, data).then((res) => res.data),
 
-  delete: (id: number) => api.delete(`/categories/${id}`),
+  delete: (id: number) => api.delete(`/categories/${id}`).then(() => undefined),
 };

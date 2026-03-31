@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import { Loader2, Building2, RefreshCw, Trash2, Plus, Landmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -49,10 +49,15 @@ function PlaidLinkOpener({
     onExit: () => onExit(),
   });
 
-  // Auto-open when ready
-  if (ready) {
-    open();
-  }
+  const openedRef = useRef(false);
+
+  // Auto-open when ready — only once
+  useEffect(() => {
+    if (ready && !openedRef.current) {
+      openedRef.current = true;
+      open();
+    }
+  }, [ready, open]);
 
   return (
     <Button disabled>

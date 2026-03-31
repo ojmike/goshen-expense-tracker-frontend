@@ -62,6 +62,9 @@ const authService = {
   },
 
   async setTrackingStart(year: number, month: number): Promise<UserResponse> {
+    if (month < 1 || month > 12) {
+      throw new Error('Month must be between 1 and 12');
+    }
     const response = await api.put<UserResponse>('/auth/me/tracking-start', null, {
       params: { year, month },
     });

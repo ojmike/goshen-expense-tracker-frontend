@@ -25,12 +25,12 @@ export default function DeleteExpenseDialog({ open, onOpenChange, expense, onCon
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Expense</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <strong>{expense?.name}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{expense?.name ?? 'this item'}</strong>? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm} disabled={isDeleting}>
+          <AlertDialogAction variant="destructive" onClick={onConfirm} disabled={isDeleting || !expense}>
             {isDeleting ? 'Deleting...' : 'Delete Expense'}
           </AlertDialogAction>
         </AlertDialogFooter>

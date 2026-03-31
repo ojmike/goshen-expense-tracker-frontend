@@ -15,7 +15,8 @@ export default function MonthSelector({ year, month, onChange }: MonthSelectorPr
 
   const minYear = user?.trackingStartYear;
   const minMonth = user?.trackingStartMonth;
-  const isAtMin = minYear != null && minMonth != null && year === minYear && month === minMonth;
+  const isAtMin = minYear != null && minMonth != null &&
+    (year < minYear || (year === minYear && month <= minMonth));
 
   const handlePrev = () => {
     if (isAtMin) return;

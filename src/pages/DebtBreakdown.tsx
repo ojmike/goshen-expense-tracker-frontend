@@ -175,7 +175,7 @@ export default function DebtBreakdown() {
                             style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>
-                        <p className="mt-1 ml-7 text-xs text-muted-foreground">{progress.toFixed(1)}% paid off</p>
+                        <p className="mt-1 ml-7 text-xs text-muted-foreground">{Math.min(progress, 100).toFixed(1)}% paid off</p>
                       </div>
                     );
                   })}

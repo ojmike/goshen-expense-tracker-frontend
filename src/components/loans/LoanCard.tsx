@@ -16,7 +16,7 @@ interface LoanCardProps {
 
 export default function LoanCard({ loan, onSelect, onDelete }: LoanCardProps) {
   const paidPercent = loan.originalAmount > 0
-    ? Math.round((loan.totalPaid / loan.originalAmount) * 100)
+    ? Math.min(100, Math.round((loan.totalPaid / loan.originalAmount) * 100))
     : 0;
 
   return (

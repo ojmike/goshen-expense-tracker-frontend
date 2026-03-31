@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { loanService, type LoanRequest, type LoanPaymentRequest } from '@/services/loanService';
 
-const LOANS_KEY = ['loans'];
+export const LOANS_KEY = ['loans'];
 
 export function useLoans() {
   return useQuery({
@@ -43,10 +43,13 @@ export function useDeleteLoan() {
 export function useRecordPayment(loanId: number | null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: LoanPaymentRequest) => loanService.recordPayment(loanId!, data),
+    mutationFn: (data: LoanPaymentRequest) => {
+      if (loanId === null) throw new Error('No loan selected');
+      return loanService.recordPayment(loanId, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LOANS_KEY });
-      queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
+      if (loanId !== null) queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
@@ -55,10 +58,13 @@ export function useRecordPayment(loanId: number | null) {
 export function useDeletePayment(loanId: number | null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (paymentId: number) => loanService.deletePayment(loanId!, paymentId),
+    mutationFn: (paymentId: number) => {
+      if (loanId === null) throw new Error('No loan selected');
+      return loanService.deletePayment(loanId, paymentId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LOANS_KEY });
-      queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
+      if (loanId !== null) queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });

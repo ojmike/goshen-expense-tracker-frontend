@@ -43,13 +43,13 @@ export const loanService = {
   create: (data: LoanRequest) =>
     api.post<Loan>('/loans', data).then((res) => res.data),
 
-  delete: (id: number) => api.delete(`/loans/${id}`),
+  delete: (id: number) => api.delete(`/loans/${id}`).then(() => undefined),
 
   recordPayment: (loanId: number, data: LoanPaymentRequest) =>
     api.post<LoanPayment>(`/loans/${loanId}/payments`, data).then((res) => res.data),
 
   deletePayment: (loanId: number, paymentId: number) =>
-    api.delete(`/loans/${loanId}/payments/${paymentId}`),
+    api.delete(`/loans/${loanId}/payments/${paymentId}`).then(() => undefined),
 
   copyPaymentsFromPreviousMonth: (year: number, month: number) =>
     api.post<LoanPayment[]>('/loans/copy-payments', null, { params: { year, month } }).then((res) => res.data),

@@ -24,13 +24,25 @@ export default function Transactions() {
   const updateCategory = useUpdateTransactionCategory(year, month);
   const markReviewed = useMarkReviewed(year, month);
 
+  const [error, setError] = useState('');
+
   const handleCategoryChange = async (txnId: number, categoryId: number) => {
-    await updateCategory.mutateAsync({ id: txnId, categoryId });
-    setEditingId(null);
+    try {
+      await updateCategory.mutateAsync({ id: txnId, categoryId });
+      setEditingId(null);
+      setError('');
+    } catch {
+      setError('Failed to update category');
+    }
   };
 
   const handleApprove = async (id: number) => {
-    await markReviewed.mutateAsync(id);
+    try {
+      await markReviewed.mutateAsync(id);
+      setError('');
+    } catch {
+      setError('Failed to approve transaction');
+    }
   };
 
   const unreviewedCount = transactions?.filter((t) => !t.reviewed).length ?? 0;
@@ -48,6 +60,12 @@ export default function Transactions() {
         </div>
 
         <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); }} />
+
+        {error && (
+          <div className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center py-16">

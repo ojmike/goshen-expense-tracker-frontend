@@ -19,7 +19,7 @@ export const plaidService = {
     api.get<LinkedAccount[]>('/plaid/accounts').then((res) => res.data),
 
   unlinkAccount: (id: number) =>
-    api.delete(`/plaid/accounts/${id}`),
+    api.delete(`/plaid/accounts/${id}`).then((res) => res.data),
 
   syncTransactions: (id: number) =>
     api.post<{ synced: number }>(`/plaid/accounts/${id}/sync`).then((res) => res.data),

@@ -34,5 +34,5 @@ export const incomeService = {
   update: (id: number, data: IncomeSourceRequest) =>
     api.put<IncomeSource>(`/income/${id}`, data).then((res) => res.data),
 
-  delete: (id: number) => api.delete(`/income/${id}`),
+  delete: (id: number) => api.delete(`/income/${id}`).then(() => undefined),
 };

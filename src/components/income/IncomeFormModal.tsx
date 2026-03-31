@@ -72,7 +72,7 @@ export default function IncomeFormModal({ open, onOpenChange, source, onSubmit }
     if (frequency === 'BIWEEKLY' && nextPayDate && !didAutoSet.current) {
       const day = new Date(nextPayDate).getUTCDate();
       const defaultSecond = day <= 15 ? day + 15 : day - 15;
-      setValue('secondPayDay', Math.min(Math.max(defaultSecond, 1), 28));
+      setValue('secondPayDay', Math.min(Math.max(defaultSecond, 1), 31));
       didAutoSet.current = true;
     }
     if (frequency !== 'BIWEEKLY') {

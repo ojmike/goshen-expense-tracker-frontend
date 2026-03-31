@@ -48,8 +48,12 @@ export default function LoanFormModal({ open, onOpenChange, onSubmit }: LoanForm
   }, [open, reset]);
 
   const handleFormSubmit = async (data: FormData) => {
-    await onSubmit(data);
-    onOpenChange(false);
+    try {
+      await onSubmit(data);
+      onOpenChange(false);
+    } catch {
+      // Error handling delegated to parent via React Query's onError
+    }
   };
 
   return (
