@@ -26,7 +26,10 @@ export default function Transactions() {
 
   const [error, setError] = useState('');
 
+  const isMutating = updateCategory.isPending || markReviewed.isPending;
+
   const handleCategoryChange = async (txnId: number, categoryId: number) => {
+    if (isMutating) return;
     try {
       await updateCategory.mutateAsync({ id: txnId, categoryId });
       setEditingId(null);
@@ -37,6 +40,7 @@ export default function Transactions() {
   };
 
   const handleApprove = async (id: number) => {
+    if (isMutating) return;
     try {
       await markReviewed.mutateAsync(id);
       setError('');
@@ -59,7 +63,7 @@ export default function Transactions() {
           )}
         </div>
 
-        <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); }} />
+        <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); setError(''); setEditingId(null); }} />
 
         {error && (
           <div className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">

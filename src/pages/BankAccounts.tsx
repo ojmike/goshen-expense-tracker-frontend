@@ -7,16 +7,20 @@ import Layout from '@/components/Layout';
 import { plaidService } from '@/services/plaidService';
 import { useLinkedAccounts, useExchangeToken, useUnlinkAccount, useSyncTransactions } from '@/hooks/usePlaid';
 
-function PlaidLinkButton({ onSuccess }: { onSuccess: (publicToken: string, metadata: { institution?: { name?: string } | null }) => void }) {
+function PlaidLinkButton({ onSuccess }: { onSuccess: (publicToken: string, metadata: { institution?: { name?: string } | null }) => Promise<void> }) {
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleClick = async () => {
     setLoading(true);
+    setError('');
     try {
       const token = await plaidService.createLinkToken();
       setLinkToken(token);
-    } catch {
+    } catch (err) {
+      console.error('Failed to create link token:', err);
+      setError('Failed to connect to bank service. Please try again.');
       setLoading(false);
     }
   };
@@ -24,10 +28,13 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: (publicToken: string, metad
   return linkToken ? (
     <PlaidLinkOpener linkToken={linkToken} onSuccess={onSuccess} onExit={() => { setLinkToken(null); setLoading(false); }} />
   ) : (
-    <Button onClick={handleClick} disabled={loading}>
-      {loading ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-      Link Bank Account
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button onClick={handleClick} disabled={loading}>
+        {loading ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+        Link Bank Account
+      </Button>
+      {error && <span className="text-sm text-destructive">{error}</span>}
+    </div>
   );
 }
 
@@ -37,14 +44,17 @@ function PlaidLinkOpener({
   onExit,
 }: {
   linkToken: string;
-  onSuccess: (publicToken: string, metadata: { institution?: { name?: string } | null }) => void;
+  onSuccess: (publicToken: string, metadata: { institution?: { name?: string } | null }) => Promise<void>;
   onExit: () => void;
 }) {
   const { open, ready } = usePlaidLink({
     token: linkToken,
-    onSuccess: (publicToken, metadata) => {
-      onSuccess(publicToken, metadata);
-      onExit();
+    onSuccess: async (publicToken, metadata) => {
+      try {
+        await onSuccess(publicToken, metadata);
+      } finally {
+        onExit();
+      }
     },
     onExit: () => onExit(),
   });
@@ -73,6 +83,7 @@ export default function BankAccounts() {
   const unlinkAccount = useUnlinkAccount();
   const syncTransactions = useSyncTransactions();
   const [syncingId, setSyncingId] = useState<number | null>(null);
+  const [actionError, setActionError] = useState('');
 
   const handlePlaidSuccess = useCallback(
     async (publicToken: string, metadata: { institution?: { name?: string } | null }) => {
@@ -86,9 +97,13 @@ export default function BankAccounts() {
 
   const handleSync = async (id: number) => {
     setSyncingId(id);
+    setActionError('');
     try {
       const result = await syncTransactions.mutateAsync(id);
       alert(`Synced ${result.synced} transactions`);
+    } catch (err) {
+      console.error('Sync failed:', err);
+      setActionError('Failed to sync transactions. Please try again.');
     } finally {
       setSyncingId(null);
     }
@@ -96,7 +111,13 @@ export default function BankAccounts() {
 
   const handleUnlink = async (id: number) => {
     if (confirm('Unlink this account? All synced transactions from it will be removed.')) {
-      await unlinkAccount.mutateAsync(id);
+      setActionError('');
+      try {
+        await unlinkAccount.mutateAsync(id);
+      } catch (err) {
+        console.error('Unlink failed:', err);
+        setActionError('Failed to unlink account. Please try again.');
+      }
     }
   };
 
@@ -107,6 +128,12 @@ export default function BankAccounts() {
           <h1 className="text-2xl font-semibold">Bank Accounts</h1>
           <PlaidLinkButton onSuccess={handlePlaidSuccess} />
         </div>
+
+        {actionError && (
+          <div className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+            {actionError}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center py-16">

@@ -13,7 +13,10 @@ export function useLoans() {
 export function useLoanDetail(id: number | null) {
   return useQuery({
     queryKey: ['loans', id],
-    queryFn: () => loanService.getDetail(id!),
+    queryFn: () => {
+      if (id === null) return Promise.reject(new Error('No loan selected'));
+      return loanService.getDetail(id);
+    },
     enabled: id !== null,
   });
 }
@@ -49,7 +52,6 @@ export function useRecordPayment(loanId: number | null) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LOANS_KEY });
-      if (loanId !== null) queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
@@ -64,7 +66,6 @@ export function useDeletePayment(loanId: number | null) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LOANS_KEY });
-      if (loanId !== null) queryClient.invalidateQueries({ queryKey: ['loans', loanId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });

@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
+
+const clampYear = (v: string | null) => {
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 2000 && n <= 2100 ? n : new Date().getFullYear();
+};
+const clampMonth = (v: string | null) => {
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 1 && n <= 12 ? n : new Date().getMonth() + 1;
+};
+
 import { ArrowLeft, Loader2, AlertTriangle, CheckCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
@@ -15,9 +25,9 @@ const currencyFormat = new Intl.NumberFormat('en-US', { style: 'currency', curre
 
 export default function BudgetBreakdown() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const [year, setYear] = useState(Number(params.get('year')) || new Date().getFullYear());
-  const [month, setMonth] = useState(Number(params.get('month')) || new Date().getMonth() + 1);
+  const [params, setParams] = useSearchParams();
+  const [year, setYear] = useState(clampYear(params.get('year')));
+  const [month, setMonth] = useState(clampMonth(params.get('month')));
 
   const { data: dashboard, isLoading: dashLoading } = useDashboard(year, month);
   const { data: cashflow, isLoading: cfLoading } = useCashFlow(year, month);
@@ -46,7 +56,7 @@ export default function BudgetBreakdown() {
           </div>
         </div>
 
-        <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); }} />
+        <MonthSelector year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m); setParams({ year: String(y), month: String(m) }, { replace: true }); }} />
 
         {isLoading ? (
           <div className="flex justify-center py-16">

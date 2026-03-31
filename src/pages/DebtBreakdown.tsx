@@ -147,6 +147,9 @@ export default function DebtBreakdown() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
+                  {loans.length === 0 && (
+                    <p className="px-6 py-8 text-center text-muted-foreground">No loans to display.</p>
+                  )}
                   {loans.map((loan, i) => {
                     const progress = loan.originalAmount > 0
                       ? (loan.totalPaid / loan.originalAmount) * 100
