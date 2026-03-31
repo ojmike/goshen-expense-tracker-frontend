@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AuthLayout from '../components/AuthLayout';
@@ -63,7 +64,7 @@ export default function Register() {
       } else if (isAxiosError(err) && !err.response) {
         setServerError('Unable to connect. Check your internet connection and try again.');
       } else {
-        setServerError('An account with this email already exists. Try signing in instead.');
+        setServerError('Something went wrong. Please try again.');
       }
     }
   };
@@ -99,13 +100,13 @@ export default function Register() {
 
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" {...register('password')} />
+          <PasswordInput id="password" {...register('password')} />
           {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm password</Label>
-          <Input id="confirmPassword" type="password" {...register('confirmPassword')} />
+          <PasswordInput id="confirmPassword" {...register('confirmPassword')} />
           {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
         </div>
 

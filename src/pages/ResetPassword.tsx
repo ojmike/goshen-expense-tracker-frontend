@@ -6,7 +6,7 @@ import { Link, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AuthLayout from '../components/AuthLayout';
@@ -97,13 +97,13 @@ export default function ResetPassword() {
 
         <div className="space-y-2">
           <Label htmlFor="newPassword">New password</Label>
-          <Input id="newPassword" type="password" {...register('newPassword')} />
+          <PasswordInput id="newPassword" {...register('newPassword')} />
           {errors.newPassword && <p className="text-sm text-destructive">{errors.newPassword.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm new password</Label>
-          <Input id="confirmPassword" type="password" {...register('confirmPassword')} />
+          <PasswordInput id="confirmPassword" {...register('confirmPassword')} />
           {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
         </div>
 

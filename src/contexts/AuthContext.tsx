@@ -6,6 +6,8 @@ interface User {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  trackingStartYear: number | null;
+  trackingStartMonth: number | null;
 }
 
 interface AuthContextType {
@@ -14,10 +16,19 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  setTrackingStart: (year: number, month: number) => Promise<void>;
   loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
+const mapUserResponse = (me: { email: string; firstName: string | null; lastName: string | null; trackingStartYear: number | null; trackingStartMonth: number | null }): User => ({
+  email: me.email,
+  firstName: me.firstName,
+  lastName: me.lastName,
+  trackingStartYear: me.trackingStartYear,
+  trackingStartMonth: me.trackingStartMonth,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -31,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return authService.getMe();
       })
       .then((me) => {
-        setUser({ email: me.email, firstName: me.firstName, lastName: me.lastName });
+        setUser(mapUserResponse(me));
       })
       .catch(() => {
         // Not logged in -- that's fine
@@ -43,14 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { accessToken } = await authService.login(email, password);
     setAccessToken(accessToken);
     const me = await authService.getMe();
-    setUser({ email: me.email, firstName: me.firstName, lastName: me.lastName });
+    setUser(mapUserResponse(me));
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {
     const { accessToken } = await authService.register(data);
     setAccessToken(accessToken);
     const me = await authService.getMe();
-    setUser({ email: me.email, firstName: me.firstName, lastName: me.lastName });
+    setUser(mapUserResponse(me));
+  }, []);
+
+  const setTrackingStart = useCallback(async (year: number, month: number) => {
+    const me = await authService.setTrackingStart(year, month);
+    setUser((prev) => prev ? { ...prev, trackingStartYear: me.trackingStartYear, trackingStartMonth: me.trackingStartMonth } : null);
   }, []);
 
   const logout = useCallback(async () => {
@@ -66,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      setTrackingStart,
       loading,
     }}>
       {children}
